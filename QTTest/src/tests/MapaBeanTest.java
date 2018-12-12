@@ -7,8 +7,7 @@ import undefinied.MapaBean;
 public class MapaBeanTest {
 	
 	public static void test1() {
-		int linhas = 6;
-		int colunas = 5;
+		// /*
 		int matriz[][] = { 	{ 4 , 4 , 4 , 4 , 4 },
 							{ 4 , 2 , 0 , 3 , 4 },
 							{ 4 , 0 , 3 , 0 , 4 },
@@ -16,10 +15,22 @@ public class MapaBeanTest {
 							{ 4 , 0 , 1 , 2 , 4 },
 							{ 4 , 4 , 4 , 4 , 4 }
 		};
+		// */
+		/*
+		int matriz[][] = { 	{ 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4},
+							{ 4 , 2 , 0 , 3 , 0 , 2 , 0 , 0 , 5 , 4},
+							{ 4 , 0 , 3 , 0 , 2 , 0 , 0 , 3 , 3 , 4},
+							{ 4 , 0 , 0 , 2 , 0 , 2 , 2 , 2 , 2 , 4},
+							{ 4 , 0 , 1 , 2 , 3 , 0 , 0 , 3 , 3 , 4},
+							{ 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4}
+												};
+		*/
+		int linhas = matriz.length;
+		int colunas = matriz[0].length;
 		MapaBean mapa = new MapaBean(linhas, colunas, matriz);
 		System.out.println(mapa.toString());
 		
-		String path = "C:\\Users\\TotemSistemas\\Desktop\\paulopasta\\iaTestes";
+		String path = "dados";
 		File file = new File(path + File.separator + "mapa.txt");
 		mapa.saveToFile(file);
 		

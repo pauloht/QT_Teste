@@ -10,7 +10,7 @@ public class QT {
 	private int numeroMaximoGen = 100;
 	
 	//constantes
-	private static final boolean showProcess = false;
+	private static final boolean showProcess = true;
 	private static final int recompensaValor = 30;
 	private static final int pontuacaoInicial = 10;
 	private static final int perdaPorPasso = 1;
@@ -31,6 +31,7 @@ public class QT {
 	
 	Stack<double[]> decisoesValores = new Stack<>();
 	Stack<Integer> decisoesIndices = new Stack<>();
+	
 	/**
 	 * 
 	 * @param acao
@@ -138,11 +139,42 @@ public class QT {
 		return(false);
 	}
 	
+	private void recalcularArvore() {
+		double variacao = 0;
+		if (pontuacao > 0.0) {
+			if (pontuacao < 20.0) {
+				variacao = 0.03;
+			}else {
+				variacao = 0.01;
+			}
+		}else if (pontuacao < 0.0) {
+			if (pontuacao > -20.0) {
+				variacao = 0.03;
+			}else {
+				variacao = -0.01;
+			}
+		}else {
+			return;
+		}
+		while (!decisoesValores.isEmpty()) {
+			double[] decisao = decisoesValores.pop();
+			int indice = decisoesIndices.pop();
+			double balanco = variacao;
+			double divisao = balanco/decisao.length;
+			for (int i=0;i<decisao.length;i++) {
+				if (decisao[i] >= divisao) {
+					decisao[i] = decisao[i] - divisao;
+					decisao[indice] = decisao[indice] + divisao;
+				}
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param taxaAleatoria valor entre 0.0 e 1.0
 	 */
-	public ArvoreDeEstados init(double taxaAleatoria, ArvoreDeEstados avInicial) {
+	public ArvoreDeEstados init(double taxaAleatoria, ArvoreDeEstados avInicial,File mapaFile) {
 		StringBuilder relatorio = new StringBuilder();
 		profundidade = Acoes.getListaAcoes().length; // numero de opcoes, nao prescissar ser necessariamente igual
 		ramoPorNo = ValorTile.getListaValorTile().length; // numero de variacoes
@@ -152,7 +184,7 @@ public class QT {
 		}else {
 			av = avInicial;
 		}
-		File mapaFile = new File("C:\\Users\\TotemSistemas\\Desktop\\paulopasta\\iaTestes\\mapa.txt");
+		//File mapaFile = new File("C:\\Users\\TotemSistemas\\Desktop\\paulopasta\\iaTestes\\mapa.txt");
 		MapaBean mapa = MapaBean.recoverFromFile(mapaFile);
 		this.mapa = mapa.getMapa();
 		
@@ -180,7 +212,7 @@ public class QT {
 			}
 		}
 		if (showProcess) {
-			String path = "C:\\Users\\TotemSistemas\\Desktop\\paulopasta\\iaTestes";
+			String path = "dados";
 			File file = new File(path + File.separator + "qtOutput.txt");
 			try(
 				RandomAccessFile raf = new RandomAccessFile(file, "rw");
@@ -192,6 +224,7 @@ public class QT {
 				e.printStackTrace();
 			}
 		}
+		recalcularArvore();
 		System.out.println("Pontuacao final : " + pontuacao);
 		return(av);
 	}
