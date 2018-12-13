@@ -13,6 +13,27 @@ public class MapaBean {
 	
 	ValorTile[][] mapa;
 	
+	private MapaBean() {
+		
+	}
+	
+	public static MapaBean criarMapaVazio(int linhas, int colunas) {
+		MapaBean novoMapa = new MapaBean();
+		novoMapa.linhas = linhas;
+		novoMapa.colunas = colunas;
+		novoMapa.mapa = new ValorTile[linhas][colunas];
+		for (int i=0;i<linhas;i++) {
+			for (int j=0;j<colunas;j++) {
+				if (i==0 || i==(linhas-1) || j==0 || j==(colunas-1)) {
+					novoMapa.mapa[i][j] = ValorTile.PAREDE;
+				}else {
+					novoMapa.mapa[i][j] = ValorTile.NADA;
+				}
+			}
+		}
+		return(novoMapa);
+	}
+	
 	public MapaBean(int linhas,int colunas,int[][] mapa) {
 		this.linhas = linhas;
 		this.colunas = colunas;

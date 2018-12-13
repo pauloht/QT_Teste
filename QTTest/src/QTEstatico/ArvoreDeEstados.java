@@ -1,4 +1,4 @@
-package undefinied;
+package QTEstatico;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,6 +12,10 @@ public class ArvoreDeEstados {
 	int ramoPorNo;
 	int tamanhoDados;
 	No raiz;
+	
+	public void validarArvore() {
+		
+	}
 	
 	public void saveToFile(File f) {
 		try(

@@ -5,9 +5,10 @@ import java.io.File;
 import undefinied.MapaBean;
 
 public class MapaBeanTest {
+	private static final String path = "dados";
 	
 	public static void test1() {
-		// /*
+		/*
 		int matriz[][] = { 	{ 4 , 4 , 4 , 4 , 4 },
 							{ 4 , 2 , 0 , 3 , 4 },
 							{ 4 , 0 , 3 , 0 , 4 },
@@ -16,7 +17,7 @@ public class MapaBeanTest {
 							{ 4 , 4 , 4 , 4 , 4 }
 		};
 		// */
-		/*
+		// /*
 		int matriz[][] = { 	{ 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4},
 							{ 4 , 2 , 0 , 3 , 0 , 2 , 0 , 0 , 5 , 4},
 							{ 4 , 0 , 3 , 0 , 2 , 0 , 0 , 3 , 3 , 4},
@@ -24,13 +25,12 @@ public class MapaBeanTest {
 							{ 4 , 0 , 1 , 2 , 3 , 0 , 0 , 3 , 3 , 4},
 							{ 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4 , 4}
 												};
-		*/
+		// */
 		int linhas = matriz.length;
 		int colunas = matriz[0].length;
 		MapaBean mapa = new MapaBean(linhas, colunas, matriz);
 		System.out.println(mapa.toString());
 		
-		String path = "dados";
 		File file = new File(path + File.separator + "mapa.txt");
 		mapa.saveToFile(file);
 		
@@ -52,7 +52,13 @@ public class MapaBeanTest {
 		System.out.println(mapa.toString(linhaInicial,colunaInicial));
 	}
 	
+	public static void test2() {
+		MapaBean novoMapa = MapaBean.criarMapaVazio(10, 10);
+		File file = new File(path + File.separator + "mapa.txt");
+		novoMapa.saveToFile(file);
+	}
+	
 	public static void main(String[] args) {
-		test1();
+		test2();
 	}
 }

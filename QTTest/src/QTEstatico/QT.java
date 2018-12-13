@@ -1,19 +1,22 @@
-package undefinied;
+package QTEstatico;
 
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.Random;
 import java.util.Stack;
 
+import undefinied.Acoes;
+import undefinied.MapaBean;
+import undefinied.ValorTile;
+
 public class QT {
 	private String nl = System.getProperty("line.separator");
 	private int numeroMaximoGen = 100;
 	
 	//constantes
-	private static final boolean showProcess = true;
 	private static final int recompensaValor = 30;
 	private static final int pontuacaoInicial = 10;
-	private static final int perdaPorPasso = 1;
+	private static final int perdaPorBacktrack = 1;
 	private static final int pontuacaoVitoria = 50;
 	private static final int pontuacaoMorte = -50;
 	
@@ -31,6 +34,38 @@ public class QT {
 	
 	Stack<double[]> decisoesValores = new Stack<>();
 	Stack<Integer> decisoesIndices = new Stack<>();
+	
+	private double[] ultimaDecisao = null;
+	private Integer ultimoIndice = null;
+	
+	private static final double minValor = 0.000001;
+	private static final double maxValor = 0.999998;
+	
+	private void julgarDecisao(double[] decisao,int indiceDecisao,double pontuacao) {
+		double balanco = pontuacao;
+		if (pontuacao < 0.0) {
+			if (decisao[indiceDecisao] < Math.abs(pontuacao)) { // tem uma divida maior do que pagamento possivel
+				balanco = -decisao[indiceDecisao];
+			}
+		}
+		double divisao = balanco/decisao.length;
+		for (int i=0;i<decisao.length;i++) {
+			if (decisao[i] < minValor) {
+				decisao[i] = 0.0;
+			}else {
+				if (decisao[i] >= divisao) {
+					decisao[i] = decisao[i] - divisao;
+					decisao[indiceDecisao] = decisao[indiceDecisao] + divisao;
+				}else {
+					decisao[indiceDecisao] += decisao[i];
+					decisao[i] = 0;
+				}
+			}
+		}
+		if (decisao[indiceDecisao] > maxValor) {
+			decisao[indiceDecisao] = 1.0;
+		}
+	}
 	
 	/**
 	 * 
@@ -63,21 +98,32 @@ public class QT {
 			switch (novoTile) {
 				case NADA:
 					mapa[linha][coluna] = ValorTile.NADAMOVIDO;
+					pontuacao = pontuacao + 1;
+					julgarDecisao(ultimaDecisao, ultimoIndice, 0.001); //0.1%
+					break;
+				case NADAMOVIDO:
+					pontuacao = pontuacao - perdaPorBacktrack;
+					julgarDecisao(ultimaDecisao, ultimoIndice, -0.001); //-0.1%
 					break;
 				case RECOMPENSA:
 					mapa[linha][coluna] = ValorTile.NADAMOVIDO;
 					pontuacao += recompensaValor; 
+					julgarDecisao(ultimaDecisao, ultimoIndice, 0.01); //+1%
 					break;
 				case MORTE:
 					pontuacao += pontuacaoMorte;
+					julgarDecisao(ultimaDecisao, ultimoIndice, -0.05); //-5%
 					break;
 				case VITORIA:
 					pontuacao += pontuacaoVitoria;
+					julgarDecisao(ultimaDecisao, ultimoIndice, 0.10); // +10%
 					break;
 				default:
 					//to nothing
 			}
 			return(true);
+		}else {
+			julgarDecisao(ultimaDecisao, ultimoIndice, -1.0); // -100%(punir severamente açoes ilegais para nao serem cometidas no futuro)  
 		}
 		return(false);
 	}
@@ -93,8 +139,31 @@ public class QT {
 		return(vda);
 	}
 	
-	private Acoes decidirNextMove() {
+	private int validarVetor(double[] vet) {
+		double sum = 0.0;
+		double maior = 0.0;
+		int maiorIndice = 0;
+		for (int i=0;i<vet.length;i++) {
+			sum += vet[i];
+			if (vet[i] > maior) {
+				maior = vet[i];
+				maiorIndice = i;
+			}
+		}
+		if (sum < 1.0) {
+			double dif = 1.0 - maior;
+			System.out.println("DIF:"+dif);
+			vet[maiorIndice] += dif;
+		}
+		return(maiorIndice);
+	}
+	
+	private Acoes decidirNextMove(double taxaDeAleatoriedade) {
 		boolean agirAleatoriamente = false;
+		double deveAgirAleatoriamente = gen.nextDouble();
+		if (taxaDeAleatoriedade > deveAgirAleatoriamente) {
+			agirAleatoriamente = true;
+		}
 		Acoes movimento = null;
 		int[] vda = getVetorDeAcesso();
 		double[] opcoes = av.acesarNo(vda);
@@ -113,12 +182,15 @@ public class QT {
 				}
 			}
 			if (opcaoSelecionada == null) {
-				throw new UnsupportedOperationException("Esse caso raro nao foi tratado, tratar!");
+				//throw new UnsupportedOperationException("Esse caso raro nao foi tratado, tratar!");
+				opcaoSelecionada = validarVetor(opcoes);
 			}
 			movimento = Acoes.getAcaoFromValor(opcaoSelecionada);
 		}
-		decisoesValores.push(opcoes);
-		decisoesIndices.push(opcaoSelecionada);
+		//decisoesValores.push(opcoes);
+		//decisoesIndices.push(opcaoSelecionada);
+		ultimaDecisao = opcoes;
+		ultimoIndice = opcaoSelecionada;
 		return(movimento);
 	}
 	
@@ -130,7 +202,7 @@ public class QT {
 	}
 	
 	private boolean jogoTerminou() {
-		if (mapa[linha][coluna]==ValorTile.MORTE) {
+		if (mapa[linha][coluna]==ValorTile.MORTE || mapa[linha][coluna]==ValorTile.VITORIA) {
 			return(true);
 		}
 		if (geracaoCorrente > numeroMaximoGen) {
@@ -139,13 +211,21 @@ public class QT {
 		return(false);
 	}
 	
-	private void recalcularArvore() {
+	private void recalcularArvoreFinal() {
 		double variacao = 0;
 		if (pontuacao > 0.0) {
-			if (pontuacao < 20.0) {
-				variacao = 0.03;
+			if (pontuacao < 10.0) {
+				if (pontuacao < 20.0) {
+					if (pontuacao < 30.0) {
+						variacao = 0.1; // pontuacao maior que 30
+					}else {
+						variacao = 0.05; // pontuacao entre 20-30
+					}
+				}else {
+					variacao = 0.03; // pontuacao entre 10-20
+				}
 			}else {
-				variacao = 0.01;
+				variacao = 0.01; // pontuacao entre 0-10
 			}
 		}else if (pontuacao < 0.0) {
 			if (pontuacao > -20.0) {
@@ -172,9 +252,9 @@ public class QT {
 	
 	/**
 	 * 
-	 * @param taxaAleatoria valor entre 0.0 e 1.0
+	 * @param taxaDeAleatoriedade valor entre 0.0 e 1.0
 	 */
-	public ArvoreDeEstados init(double taxaAleatoria, ArvoreDeEstados avInicial,File mapaFile) {
+	public void init(ArvoreDeEstados avInicial,File mapaFile, double taxaDeAleatoriedade,boolean showProcess) {
 		StringBuilder relatorio = new StringBuilder();
 		profundidade = Acoes.getListaAcoes().length; // numero de opcoes, nao prescissar ser necessariamente igual
 		ramoPorNo = ValorTile.getListaValorTile().length; // numero de variacoes
@@ -197,18 +277,17 @@ public class QT {
 			relatorio.append(mapa.toString(linha, coluna));
 		}
 		while (!jogoTerminou()) {
-			Acoes acao = decidirNextMove(); //decide acao
+			Acoes acao = decidirNextMove(taxaDeAleatoriedade); //decide acao
 			if (agir(acao)) { // valida acao
 				if (showProcess) {
 					relatorio.append("Gen ").append(geracaoCorrente).append(" Movimento:").append(acao).append(nl);
 					relatorio.append(mapa.toString(linha, coluna));
 				}
 				geracaoCorrente++;
-				pontuacao = pontuacao - perdaPorPasso;
 			}else {
 				//remove historico
-				decisoesValores.pop();
-				decisoesIndices.pop();
+				//decisoesValores.pop();
+				//decisoesIndices.pop();
 			}
 		}
 		if (showProcess) {
@@ -224,8 +303,14 @@ public class QT {
 				e.printStackTrace();
 			}
 		}
-		recalcularArvore();
-		System.out.println("Pontuacao final : " + pontuacao);
+		//recalcularArvore();
+	}
+	
+	public int getPontuacao() {
+		return(pontuacao);
+	}
+	
+	public ArvoreDeEstados getArvore() {
 		return(av);
 	}
 }

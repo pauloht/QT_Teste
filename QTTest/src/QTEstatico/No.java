@@ -1,4 +1,4 @@
-package undefinied;
+package QTEstatico;
 
 public class No {
 	private No[] filhos = null;

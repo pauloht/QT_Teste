@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import undefinied.ArvoreDeEstados;
+import QTEstatico.ArvoreDeEstados;
 
 public class ArvoreTestes {
 	private static String getFileContents(File file) {
