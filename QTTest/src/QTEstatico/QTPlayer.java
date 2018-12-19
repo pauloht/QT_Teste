@@ -9,7 +9,7 @@ import undefinied.Acoes;
 import undefinied.MapaBean;
 import undefinied.ValorTile;
 
-public class QT {
+public class QTPlayer {
 	private String nl = System.getProperty("line.separator");
 	private int numeroMaximoGen = 100;
 	

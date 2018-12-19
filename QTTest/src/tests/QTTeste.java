@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.RandomAccessFile;
 
 import QTEstatico.ArvoreDeEstados;
-import QTEstatico.QT;
+import QTEstatico.QTPlayer;
 import undefinied.Acoes;
 import undefinied.ValorTile;
 
@@ -26,7 +26,7 @@ public class QTTeste {
 		int contadorTeste = 0;
 		aux.append("teste pontuacao taxaAleatoria").append(nl);
 		for (int i=0;i<numeroDeTestes;i++) {
-			QT qt = new QT();
+			QTPlayer qt = new QTPlayer();
 			//double taxaAleatoria = (1.0 - (i+0.00)/(numeroDeTestes+0.0));
 			double taxaAleatoria = 0.0;
 			//System.out.println("taxaAleatoria:"+taxaAleatoria);
@@ -59,7 +59,7 @@ public class QTTeste {
 		int numeroDeTestes = 1;
 		ArvoreDeEstados arvoreUsada = ArvoreDeEstados.loadFromFile(arvoreFile);
 		for (int i=0;i<numeroDeTestes;i++) {
-			QT qt = new QT();
+			QTPlayer qt = new QTPlayer();
 			qt.init(arvoreUsada,mapaFile,0.0,true);
 			arvoreUsada = qt.getArvore();
 			System.out.println("Pontuacao:"+qt.getPontuacao());
