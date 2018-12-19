@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Neuronio {
-	List<Arestas> conexoes = null;
+	List<Arestas> conexoes = null; // nivel anterior
 	Double bias;
 	
 	boolean ativo = false;
@@ -43,9 +43,6 @@ public class Neuronio {
 	}
 	
 	protected double calcularValor(Double[] inputValor,Double[] pesos) {
-		if (this.conexoes!=null) {
-			throw new UnsupportedOperationException("conexoes ja setadas");
-		}
 		if (inputValor.length != pesos.length) {
 			throw new IllegalArgumentException("Tamanhos diferentes!!");
 		}
@@ -55,4 +52,5 @@ public class Neuronio {
 		}
 		return(valorTmp);
 	}
+
 }

@@ -16,19 +16,21 @@ public class Blackbox {
 				novaLista.add(nr); // inclue neuronios em lista
 			}
 		}
-		for (int i=hiddenLayer.size()-1;i>0;i--) { // iteracoes por cada nivel
-			List<Neuronio> layerSelecionada = hiddenLayer.get(i); //layer de neuronios que para cada neuronio associara conexoes
-			List<Neuronio> alvo;
+		for (int i=hiddenLayer.size()-1;i>=0;i--) { // iteracoes por cada nivel associa nivel i com nivel i-1
+			List<Neuronio> proximaLayer; //layer de neuronios que para cada neuronio associara conexoes
+			List<Neuronio> layerAtual = hiddenLayer.get(i);
 			if (i==hiddenLayer.size()-1) {
-				alvo = outputLayer; // se for ultima lista de neuronios associa a outputlayer
+				proximaLayer = outputLayer; // se for ultima lista de neuronios associa a outputlayer
+				System.out.println("Setando conexoes em layer :" + (i)+"->outputLayer");
 			}else {
-				alvo = hiddenLayer.get(i+1); // se nao for ultima lista de neuronio associa essa lista de hidden layer a proxima lista
+				proximaLayer = hiddenLayer.get(i+1); // se nao for ultima lista de neuronio associa essa lista de hidden layer a proxima lista
+				System.out.println("Setando conexoes em layer :" + (i)+"->"+(i+1));
 			}
-			for (int j=0;j<layerSelecionada.size();j++){ // iteracao por cada neuronio
-				Neuronio neuronioSetado = layerSelecionada.get(j); //neuronio selecionado
+			for (int j=0;j<proximaLayer.size();j++){ // iteracao por cada neuronio
+				Neuronio neuronioSetado = proximaLayer.get(j); //neuronio selecionado
 				List<Arestas> conexoes = new ArrayList<>(); // conexoes que serao adicionadas ao neuronio
-				for (int k=0;k<alvo.size();k++) { // lista de neuronios para criar lista de arestas
-					Neuronio nr = alvo.get(k); // selecionado neuronio
+				for (int k=0;k<layerAtual.size();k++) { // lista de neuronios para criar lista de arestas
+					Neuronio nr = layerAtual.get(k); // selecionado neuronio
 					Arestas ar = new Arestas(nr); // cria aresta associada a neuronio acima
 					conexoes.add(ar); // adiciona aresta a lista de arestas
 				}
@@ -37,14 +39,28 @@ public class Blackbox {
 		}
 	}
 	
-	protected void conectarInputLayer(List<Neuronio> inputLayer) {
-		for (Neuronio nr : inputLayer) {
+	protected void ativarHiddenLayer(FuncaoDeAtivacao fda) {
+		//ativa layers em ordem 1,2...ultima
+		int numeroLayer = 0;
+		for (List<Neuronio> layer : hiddenLayer) {
+			//System.out.println("Ativando layer " + numeroLayer);
+			numeroLayer++;
+			for (Neuronio nr : layer) {
+				fda.ativa(nr);
+			}
+		}
+	}
+
+	public void conectarInputLayer(List<Neuronio> inputLayer) {
+		// TODO Auto-generated method stub
+		for (Neuronio hiddenLayerNr : hiddenLayer.get(0)) {
 			List<Arestas> conexoes = new ArrayList<>();
-			for (Neuronio hiddenLayerNr : hiddenLayer.get(0)) {
-				Arestas ar = new Arestas(hiddenLayerNr);
+			for (int k=0;k<inputLayer.size();k++) {
+				Neuronio inputLayerNr = inputLayer.get(k);
+				Arestas ar = new Arestas(inputLayerNr);
 				conexoes.add(ar);
 			}
-			nr.setConexoes(conexoes);
+			hiddenLayerNr.setConexoes(conexoes);
 		}
 	}
 }

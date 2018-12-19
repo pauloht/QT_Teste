@@ -41,10 +41,28 @@ public class RedeNeuralInterface {
 	}
 	
 	public List<Double> getOutput() {
+		//seta valores da primeira layer
 		for (int i=0;i<inputLayer.size();i++) {
 			Neuronio inputNr = inputLayer.get(i);
 			double valor = inputNr.calcularValor(inputValores, inputPesos[i]);
 			fda.ativa(inputNr,valor);
 		}
+		//agora os neuronios da inputlayer estado ou ativos ou inativo
+		//com  base na inputlayer eh possivel ativar a blackbox(hidden layer)
+		bb.ativarHiddenLayer(fda); // ativa hidden layer
+		List<Double> lastLayerOutput = new ArrayList<>();
+		for (int i=0;i<outputLayer.size();i++) {
+			Neuronio outputNr = outputLayer.get(i);
+			Double valor = outputNr.calcularValor();
+			lastLayerOutput.add(valor);
+		}
+		return lastLayerOutput;
+	}
+	
+	public void setInput(Double[] valoresInput) {
+		if (valoresInput.length != inputLayer.size()) {
+			throw new IllegalArgumentException("valores.size != inputLayer.size() => " + valoresInput.length +" != " + inputLayer.size());
+		}
+		inputValores = valoresInput;
 	}
 }
