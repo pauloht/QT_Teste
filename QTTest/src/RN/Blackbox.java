@@ -1,10 +1,12 @@
 package RN;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Blackbox {
 	List<List<Neuronio>> hiddenLayer;
+	private static final String nl = System.getProperty("line.separator");
 	
 	protected Blackbox(int numeroDeLayers,int neuroniosPorLayer,List<Neuronio> outputLayer) {
 		hiddenLayer = new ArrayList<>();
@@ -62,5 +64,43 @@ public class Blackbox {
 			}
 			hiddenLayerNr.setConexoes(conexoes);
 		}
+	}
+	
+	protected void setArestasPesos(List<List<List<Double>>> arestaPesos) {
+		int numeroDeLayers = arestaPesos.size();
+		int neuroniosPorLayer = arestaPesos.get(0).size();
+		if (numeroDeLayers != hiddenLayer.size()) {
+			throw new IllegalArgumentException("numeroDeLayers != hiddenLayer.size()");
+		}
+		if (neuroniosPorLayer != hiddenLayer.get(0).size()) {
+			throw new IllegalArgumentException("neuroniosPorLayer != arestaPesos.get(0).size();");
+		}
+		for (int i=0;i<numeroDeLayers;i++) {
+			List<Neuronio> layerNeuronio = hiddenLayer.get(i);
+			List<List<Double>> arestaLayer = arestaPesos.get(i);
+			for (int j=0;j<neuroniosPorLayer;j++) {
+				Neuronio nr = layerNeuronio.get(j);
+				List<Arestas> arLista = nr.getArestas();
+				List<Double> arestaP = arestaLayer.get(j);
+				for (int k=0;k<arLista.size();k++) {
+					Arestas ar = arLista.get(k);
+					Double peso = arestaP.get(k);
+					ar.peso = peso;
+				}
+				nr.bias = arestaP.get(arestaP.size()-1);
+			}
+		}
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder aux = new StringBuilder();
+		for (List<Neuronio> l : hiddenLayer) {
+			for (Neuronio nr : l) {
+				aux.append(nr.toString()).append(" ");
+			}
+			aux.append(nl);
+		}
+		return(aux.toString());
 	}
 }

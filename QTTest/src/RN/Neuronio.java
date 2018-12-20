@@ -6,8 +6,7 @@ import java.util.Random;
 public class Neuronio {
 	List<Arestas> conexoes = null; // nivel anterior
 	Double bias;
-	
-	boolean ativo = false;
+	Double valor;
 	
 	protected Neuronio(List<Arestas> conexoes,Double bias) {
 		this.conexoes = conexoes;
@@ -34,23 +33,39 @@ public class Neuronio {
 		}
 		double valorTmp = 0.00;
 		for (Arestas ar : conexoes) {
-			if (ar.neuronio.ativo) {
-				valorTmp += ar.peso; // ar.peso * valor de ativacao?
-			}
+			valorTmp += ar.getArestaValor(); // ar.peso * valor de ativacao?
 		}
 		valorTmp += bias;
 		return(valorTmp);
 	}
 	
-	protected double calcularValor(Double[] inputValor,Double[] pesos) {
-		if (inputValor.length != pesos.length) {
-			throw new IllegalArgumentException("Tamanhos diferentes!!");
-		}
-		double valorTmp = 0.00;
-		for (int i=0;i<inputValor.length;i++) {
-			valorTmp += inputValor[i]*pesos[i];
-		}
-		return(valorTmp);
+	protected double setValor(Double inputValor) {
+		valor = inputValor;
+		return(valor);
+	}
+	
+	protected double getValor() {
+		return(valor);
+	}
+	
+	protected List<Arestas> getArestas() {
+		return(conexoes);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder aux = new StringBuilder();
+		aux.append(valor).append("=");
+		boolean first = true;
+		for (Arestas ar : conexoes) {
+			if (!first) {
+				aux.append("+");
+			}else {
+				first = false;
+			}
+			aux.append(ar.getNeuronio().getValor() + "*" + ar.getPeso());
+		}
+		aux.append("+").append(bias);
+		return(aux.toString());
+	}
 }

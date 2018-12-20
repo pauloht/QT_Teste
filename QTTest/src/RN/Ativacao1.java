@@ -3,20 +3,12 @@ package RN;
 public class Ativacao1 implements FuncaoDeAtivacao{
 
 	@Override
-	public void ativa(Neuronio neuronio) {
-		// TODO Auto-generated method stub
+	public double ativa(Neuronio neuronio) {
 		if (neuronio.calcularValor() > 0.0) {
-			neuronio.ativo = true;
+			neuronio.setValor(1.0);
+			return(1.0);
 		}
-		neuronio.ativo = false;
+		neuronio.setValor(0.0);
+		return(0.0);
 	}
-
-	@Override
-	public void ativa(Neuronio neuronio, double valor) {
-		if (valor > 0.0) {
-			neuronio.ativo = true;
-		}
-		neuronio.ativo = false;
-	}
-
 }

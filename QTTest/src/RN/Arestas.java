@@ -23,4 +23,20 @@ public class Arestas {
 		this.neuronio = neuronio;
 		this.peso = gen.nextDouble()*variacaoTotal + minValor;
 	}
+	
+	public Neuronio getNeuronio() {
+		return(neuronio);
+	}
+	
+	public double getPeso() {
+		return(peso);
+	}
+	
+	public double getArestaValor() {
+		return(neuronio.getValor()*peso);
+	}
+	
+	public void updatePesoPorErro() {
+		throw new UnsupportedOperationException("Implementar");
+	}
 }
